@@ -1,173 +1,178 @@
+<?php
+  session_start();
+  if(!$_SESSION['loggedIn'] && $_SESSION['loggedIn'] != true){
+    header("location : http://localhost/iNotes/index.php");
+    exit();
+  }
+?>
+
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
-        #ques{
-            min-height: 227px;
+        #ques {
+            min-height: 378px;
         }
-        .abc1{
+
+        .abc1 {
             text-decoration: none;
             color: black;
         }
-        .abc1 :hover{
+
+        .abc1 :hover {
             text-decoration: underline;
+        }
+        body{
+            background-color: #1a2035;
+            color: white;
         }
     </style>
     <title>Welcome to iDiscuss - Coding forum</title>
-  </head>
-  <body>
+</head>
+
+<body>
     <?php include 'partial/header.php' ?>
 
     <!-- Connected to Database -->
     <?php include 'partial/_dbConnect.php'; ?>
 
     <?php
-        $id = $_GET['threadid'];
-        $sql = "select * from threads where thread_id=$id";
-        $result = mysqli_query($conn,$sql);
+        $subject_id = $_GET['subid'];
+        $sql = "select * from subjects where subject_id=$subject_id";
+        $result = mysqli_query($conn, $sql);
 
-        while($row = mysqli_fetch_assoc($result)){
-            $threadname = $row['thread_title'];
-            $threaddesc = $row['thread_desc'];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $subject_name = $row['subject_name'];
+            $subject_desc = $row['subject_desc'];
+            $sub_category = $row['sub_category'];
         }
     ?>
 
     <?php
-        if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true){
-            $user = $_SESSION['firstname'].' '.$_SESSION['lastname'];
-        }
-        else{
-            $user = "Anonymous User";
-        }
-
-        $showAlert = false;
-        $method = $_SERVER['REQUEST_METHOD'];
-        if($method == 'POST'){
-            //Insert thread into Database
-            $cmt_content = $_POST['comment'];
-            $cmt_content = str_replace("<" , "&lt" , $cmt_content);
-            $cmt_content = str_replace(">" , "&gt" , $cmt_content);
-            
-            $sql = "insert into comments (comment_content,thread_id,comment_by) values ('$cmt_content','$id','$user')";
-            $result = mysqli_query($conn,$sql);
-            $showAlert = true;
-
-            if($showAlert){
-                echo '
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong>Success!</strong> Your Comment has been added!
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                ';
-            }
+        if (isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true) {
+            $userid = $_SESSION['userid'];
         }
     ?>
-
     <div class="container my-4">
         <div class="alert alert-info" role="alert">
-            <h4 class="display-4"><?php echo $threadname ?></h4>
-            <p ><?php echo $threaddesc ?></p>
-            <hr class="my-4">
-            <p>This is a peer to peer forum. No spam / Advertising / Self-promote in the forums is not allowed. Do not post copyright-infringing material. Do not post "offensive" posts, links or images. Do not cross post questions. Remain respectful of other members at all times.</p>
-            <p>Posted by: 
-                <b>
-                    <?php
-                        if(isset($_GET['user'])){
-                            $user = $_GET['user'];
-                            echo $user;
+            <h4 class="display-4 text-center"><?php echo $subject_name ?></h4>
+            <p><?php echo $subject_desc ?></p>
 
-                        }
-                        else{
-                            echo "Anonymous User";
-                        }
-                    ?>
-                </b>
-            </p>
         </div>
     </div>
     
+    <div class="container px-6">
+        <?php
+            if(isset($_GET['unitid'])){
+                $unit_id = $_GET['unitid'];
+                $sql = "select * from units where unit_id='$unit_id'";
+                $result = mysqli_query($conn, $sql);
+
+                $row = mysqli_fetch_assoc($result);
+                $file_cat_name = $row['unit_name'];
+                echo '<h3 class="text-center">'.$file_cat_name.'</h3>';
+            }
+            if(isset($_GET['assignmentid'])){
+                $assignment_id = $_GET['assignmentid'];
+                $sql = "select * from assignments where assignment_id='$assignment_id'";
+                $result = mysqli_query($conn, $sql);
+
+                $row = mysqli_fetch_assoc($result);
+                $file_cat_name = $row['assignment_name'];
+                echo '<h3 class="text-center">'.$file_cat_name.'</h3>';
+            }
+        ?>
+        <hr>
+    </div>
+
+    <style>
+        .container .table th,td{
+            text-align: center;
+        }
+        #coln{
+            width: 10%;
+        }
+    </style>
+
     <?php
-        if(isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true){
-            $threadid = $_GET['threadid'];
-            $user = $_GET['user'];
-            echo '
-                <div class="container alert alert-warning">
-                    <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                    Post a Comment
-                    </a>
-                    <div class="collapse" id="collapseExample">
-                    <h1 class="my-4">Add Your Comment</h1>
-                    <form action="threadlist.php?threadid='.$threadid.'&user='.$user.'" method="POST">
-                        <div class="mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Type your comment</label>
-                            <textarea class="form-control" name="comment" id="comment" rows="3" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Post Comment</button>
-                    </form>
-                    </div>
+        $sql = "select * from files where file_cat_name='$file_cat_name'";
+        $result = mysqli_query($conn, $sql);
+        $numofRows = mysqli_num_rows($result);
+
+        if($numofRows == 0){
+            echo'
+                <div class="container alert-warning">
+                    <h2>No Document Found!!</h2>
+                    <br>
+                    <h4>
+                        Documents are not uploaded yet!
+                        <br>
+                        You can wait until admin upload any file.
+                    </h4>
                 </div>
             ';
         }
         else{
             echo'
-                <div class="container alert alert-warning">
-                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal" role="button" aria-expanded="false" aria-controls="collapseExample">
-                    Post a Comment
-                    </a>
+                <div class="container px-5" id="ques">
+                    <table class="table table-bordered table-warning">
+                        <tr>
+                            <th scope="col" id="coln">
+                                Sr No.
+                            </th>
+                            <th>
+                                Filename
+                            </th>
+                            <th>
+                                File Category
+                            </th>
+                            <th>
+                                Download
+                            </th>
+                        </tr>
+                    <tbody>
+                    ';
+                            $sql = "select * from files where file_cat_name='$file_cat_name'";
+                            $result = mysqli_query($conn, $sql);
+        
+                            $i = 1;
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                $file_id = $row['file_id'];
+                                $file_name = $row['file_name'];
+                                $file_category = $row['file_category'];
+                                echo '
+                                    <tr>
+                                        <td>
+                                            '.$i.'
+                                        </td>
+                                        <td>
+                                            ' . $file_name . '
+                                        </td>
+                                        <td>
+                                            ' . $file_category . '
+                                        </td>
+                                        <td>
+                                            <a href="filedownload.php?file='.$file_name.'"><i class="fa fa-download"></i></a>
+                                        </td>
+                                    </tr>   
+                                ';
+                                $i++;
+                            }
+                            echo '
+                        </tbody>
+                    </table>
                 </div>
             ';
-        }     
+        }
     ?>
-    
-    <!-- category contain starts here -->
-    <div class="container my-3 mb-5" id="ques">
-        <h1>Discussion</h1>
-        <hr>
-        <?php
-            $id = $_GET['threadid'];
-            $sql = "select * from comments where thread_id=$id";
-            $result = mysqli_query($conn,$sql);
-            $noresult = true;
-
-            while($row = mysqli_fetch_assoc($result)){
-                $noresult = false;
-                $cmt_id = $row['comment_id'];
-                $content = $row['comment_content'];
-                $date = $row['comment_time'];
-                $user = $row['comment_by'];
-
-                echo '
-                    <div class="d-flex my-3">
-                    <div class="flex-shrink-0">
-                        <img src="images/user.png" width="54px" alt="...">
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <p class="font-weight-bold my-0"><b>'.$user.' at '.$date.'</b></p>
-                        '.$content.'
-                    </div>
-                    </div>
-                ';
-            }
-            if($noresult){
-                echo '
-                    <div class="alert alert-secondary">
-                        <div class="container">
-                            <p class="display-4">No Comments Found!</p>
-                            <p class="lead">Be the first person to add a comment.</p>
-                        </div>
-                    </div>
-                ';
-            }
-        ?>
-
-    </div>
-    
 
     <?php include 'partial/footer.php'; ?>
 
@@ -181,5 +186,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
     -->
-  </body>
+</body>
+
 </html>

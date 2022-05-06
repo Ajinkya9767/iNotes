@@ -3,7 +3,7 @@
     session_start();
     // echo "Logging you out. Please wait...";
     session_destroy();
-    header("location: http://localhost/php_tutorial/Forum/index.php");
+    header("location: http://localhost/iNotes/index.php");
     exit();
     
 ?>

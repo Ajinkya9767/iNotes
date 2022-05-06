@@ -80,7 +80,7 @@
 
     <div class="container col-md-6 my-4">
         <h1 class="text-center">SignUp to our website</h1>
-        <form action="/php_tutorial/forum/signup.php" method="POST">
+        <form action="/iNotes/signup.php" method="POST">
             <div class="mb-3">
                 <label for="username" class="form-labe">Username</label>
                 <input type="text" maxlength="11" class="form-control" name="username" id="username" aria-describedby="emailHelp" required>

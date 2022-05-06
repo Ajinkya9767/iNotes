@@ -32,7 +32,7 @@
             <hr>
             <?php 
                 $search = $_GET["search"];
-                $sql = "SELECT * FROM `threads` where MATCH(thread_title,thread_desc) against ('$search')";
+                $sql = "SELECT * FROM `units` where MATCH(unit_name,unit_desc) against ('$search')";
                 $result = mysqli_query($conn, $sql);
                 $noresult = true;
         

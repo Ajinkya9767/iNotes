@@ -12,6 +12,10 @@
       #maincontainer{
           min-height: 633px;
       }
+      body{
+          background-color: #1a2035;
+          color: white;
+      }
     </style>
     <title>Welcome to iDiscuss - Coding forum</title>
   </head>
